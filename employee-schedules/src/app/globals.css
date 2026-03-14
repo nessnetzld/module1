@@ -1,0 +1,93 @@
+:root {
+  --background: #f4f1ea;
+  --surface: #fffaf2;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #d6d3d1;
+  --primary: #1d4ed8;
+  --primary-hover: #1e40af;
+  --danger: #b91c1c;
+  --danger-hover: #991b1b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(180deg, #f7f3eb 0%, #efe8dc 100%);
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.app-header {
+  padding: 2rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 250, 242, 0.9);
+}
+
+.app-main {
+  padding: 2rem 1.5rem;
+}
+
+.home-panel {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.app-subtitle {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--muted);
+  text-align: center;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.action-button {
+  padding: 1rem 1.2rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.action-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .app-title {
+    font-size: 1.8rem;
+  }
+}
