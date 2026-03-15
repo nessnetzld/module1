@@ -1,7 +1,15 @@
 import { getEmployees } from "@/lib/db";
 
 export default async function Home() {
-  const employees = await getEmployees().catch(() => []);
+  let employees: Awaited<ReturnType<typeof getEmployees>> = [];
+  let loadError: string | null = null;
+
+  try {
+    employees = await getEmployees();
+  } catch (error) {
+    loadError =
+      error instanceof Error ? error.message : "Unknown database error.";
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-5xl flex-col bg-zinc-100 px-6 py-10">
@@ -29,9 +37,16 @@ export default async function Home() {
         <h2 className="mb-4 text-xl font-semibold text-zinc-800">Employees</h2>
 
         {employees.length === 0 ? (
-          <p className="text-zinc-600">
-            No employees found or database is not configured yet.
-          </p>
+          <div className="space-y-2">
+            <p className="text-zinc-600">
+              No employees found or database is not configured yet.
+            </p>
+            {loadError ? (
+              <p className="text-sm text-red-700">
+                Database error: {loadError}
+              </p>
+            ) : null}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full border-collapse text-left text-sm">
