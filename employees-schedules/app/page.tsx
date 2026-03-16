@@ -1,11 +1,17 @@
-import { getEmployees } from "@/lib/db";
+import { getEmployeeScheduleRows, getEmployees } from "@/lib/db";
+import NewEmployeeForm from "@/app/components/new-employee-form";
+import UpdateEmployeeForm from "@/app/components/update-employee-form";
+import EmployeeScheduleForm from "@/app/components/employee-schedule-form";
+import SchedulesTable from "@/app/components/schedules-table";
 
 export default async function Home() {
   let employees: Awaited<ReturnType<typeof getEmployees>> = [];
+  let scheduleRows: Awaited<ReturnType<typeof getEmployeeScheduleRows>> = [];
   let loadError: string | null = null;
 
   try {
     employees = await getEmployees();
+    scheduleRows = await getEmployeeScheduleRows();
   } catch (error) {
     loadError =
       error instanceof Error ? error.message : "Unknown database error.";
@@ -18,65 +24,18 @@ export default async function Home() {
       </h1>
 
       <div className="mb-8 flex gap-4">
-        <button
-          type="button"
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
-        >
-          New employee
-        </button>
-
-        <button
-          type="button"
-          className="rounded-lg bg-emerald-600 px-6 py-3 text-white transition hover:bg-emerald-700"
-        >
-          Update employee
-        </button>
+        <NewEmployeeForm />
+        <UpdateEmployeeForm employees={employees} />
+        <EmployeeScheduleForm employees={employees} />
       </div>
 
-      <section className="rounded-xl bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-zinc-800">Employees</h2>
+      <SchedulesTable rows={scheduleRows} />
 
-        {employees.length === 0 ? (
-          <div className="space-y-2">
-            <p className="text-zinc-600">
-              No employees found or database is not configured yet.
-            </p>
-            {loadError ? (
-              <p className="text-sm text-red-700">
-                Database error: {loadError}
-              </p>
-            ) : null}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-zinc-200 text-zinc-700">
-                  <th className="py-2 pr-4">ID</th>
-                  <th className="py-2 pr-4">Name</th>
-                  <th className="py-2 pr-4">LOB</th>
-                  <th className="py-2 pr-4">Company</th>
-                  <th className="py-2 pr-4">Hire date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map((employee) => (
-                  <tr
-                    key={employee.employee_id}
-                    className="border-b border-zinc-100"
-                  >
-                    <td className="py-2 pr-4">{employee.employee_id}</td>
-                    <td className="py-2 pr-4">{employee.employee_name}</td>
-                    <td className="py-2 pr-4">{employee.lob}</td>
-                    <td className="py-2 pr-4">{employee.company}</td>
-                    <td className="py-2 pr-4">{employee.hire_date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+      {loadError ? (
+        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
+          Database error: {loadError}
+        </p>
+      ) : null}
     </main>
   );
 }

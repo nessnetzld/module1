@@ -16,7 +16,14 @@ If you are on PowerShell:
 Copy-Item .env.example .env.local
 ```
 
-Update `DATABASE_URL` in `.env.local` with your PostgreSQL credentials.
+Update `.env.local` with your PostgreSQL credentials.
+
+You can use either:
+
+- `DATABASE_URL` (recommended), or
+- split variables: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.
+
+If `DATABASE_URL` is set, the app will use it first.
 
 ## 2) Create database and tables
 
@@ -26,7 +33,7 @@ Create a database named `employees_db` and run:
 database/employees.sql
 ```
 
-This script creates table `employees` and inserts sample data.
+This script creates tables `employees` and `employee_schedules`, then inserts sample employees.
 
 ## 3) Run the app
 
