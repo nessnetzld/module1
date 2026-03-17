@@ -1,47 +1,17 @@
-# Employee Schedules
+# Overview
 
-Next.js + TypeScript app connected to PostgreSQL.
+This project has the purpose to demonstrate the learning skills acquire after this module of
+learning Typescript, the project was necessary to build a little web application to reinforce and
+apply every principle and assignment requirement.
 
-## 1) Configure environment variables
+[Software Demo Video](https://youtu.be/UPwwuyoxqCc)
 
-Create a local env file based on the example:
+# Development Environment
 
-```bash
-cp .env.example .env.local
-```
+Typescript + Next.js + React, app connected to PostgreSQL.
 
-If you are on PowerShell:
+# Useful Websites
 
-```powershell
-Copy-Item .env.example .env.local
-```
+# Hours spent
 
-Update `.env.local` with your PostgreSQL credentials.
-
-You can use either:
-
-- `DATABASE_URL` (recommended), or
-- split variables: `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`.
-
-If `DATABASE_URL` is set, the app will use it first.
-
-## 2) Create database and tables
-
-Create a database named `employees_db` and run:
-
-```sql
-database/employees.sql
-```
-
-This script creates tables `employees` and `employee_schedules`, then inserts sample employees.
-
-## 3) Run the app
-
-```bash
-npm install
-npm run dev
-```
-
-Open `http://localhost:3000`.
-
-If the connection is valid, the home page will show employees from PostgreSQL.
+14 hours
