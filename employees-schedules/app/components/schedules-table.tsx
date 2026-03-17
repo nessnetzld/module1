@@ -1,5 +1,8 @@
 "use client";
 
+// Client component that renders the read-only schedules overview table and the
+// inline "Modify schedule" modal for editing an existing employee's weekly schedule.
+
 import { useActionState, useMemo, useState } from "react";
 import {
   deleteWeeklyScheduleAction,
@@ -32,6 +35,8 @@ type DaySchedule = {
 
 type EditableSchedule = Record<Weekday, DaySchedule>;
 
+// Truncates a full DB time string (e.g. "08:00:00") to the "HH:MM" format required
+// by HTML <input type="time"> elements. Returns an empty string for null values.
 function toTimeInput(value: string | null): string {
   if (!value) {
     return "";
@@ -40,6 +45,9 @@ function toTimeInput(value: string | null): string {
   return value.slice(0, 5);
 }
 
+// Converts a read-only EmployeeScheduleTableRow (loaded from the DB) into an
+// EditableSchedule whose time strings are compatible with <input type="time"> props.
+// LIST: maps all seven day entries of the row into the editable schedule structure.
 function toEditableSchedule(row: EmployeeScheduleTableRow): EditableSchedule {
   return {
     monday: {
@@ -80,6 +88,8 @@ function toEditableSchedule(row: EmployeeScheduleTableRow): EditableSchedule {
   };
 }
 
+// Formats a DB time string for display in the read-only table cells.
+// Returns "-" for null values (days with no schedule row) and trims to "HH:MM".
 function formatTime(value: string | null): string {
   if (!value) {
     return "-";
@@ -92,6 +102,11 @@ type SchedulesTableProps = {
   rows: EmployeeScheduleTableRow[];
 };
 
+// React component that renders all employee schedules in a table and provides
+// "Modify" and "Delete" actions per row.
+// ASYNCHRONOUS FUNCTION: useActionState wires up saveWeeklyScheduleAction, an async
+// server action, enabling non-blocking schedule updates directly from the table.
+// LIST: maps the rows array to produce one <tr> per employee in the table body.
 export default function SchedulesTable({ rows }: SchedulesTableProps) {
   const [editingRow, setEditingRow] = useState<EmployeeScheduleTableRow | null>(
     null,
@@ -103,6 +118,9 @@ export default function SchedulesTable({ rows }: SchedulesTableProps) {
     initialSaveWeeklyScheduleState,
   );
 
+  // Computes the live payable-hours preview for the row currently being edited.
+  // Returns null when no row is open so downstream code can skip the calculation.
+  // LIST: iterates WEEKDAY_META to build a per-day hours record for the edit form.
   const editingDailyHours = useMemo(() => {
     if (!editableSchedule) {
       return null;
@@ -128,11 +146,16 @@ export default function SchedulesTable({ rows }: SchedulesTableProps) {
     return result;
   }, [editableSchedule]);
 
+  // Opens the "Modify schedule" modal for a given row and pre-populates the editable
+  // schedule state from the employee's existing DB values so the user sees their
+  // current schedule rather than blank inputs.
   const openModifyModal = (row: EmployeeScheduleTableRow) => {
     setEditingRow(row);
     setEditableSchedule(toEditableSchedule(row));
   };
 
+  // Closes the modify modal and resets editing state back to null so the table
+  // returns to its read-only view without any lingering draft data.
   const closeModifyModal = () => {
     setEditingRow(null);
     setEditableSchedule(null);

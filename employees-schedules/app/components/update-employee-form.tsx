@@ -1,5 +1,9 @@
 "use client";
 
+// Client component for editing an existing employee record.
+// Rendered on the browser so it can manage search state and the modal locally
+// before submitting the changed data to the server action.
+
 import { useActionState, useState } from "react";
 import { updateEmployeeAction } from "@/app/actions/employees";
 import type { UpdateEmployeeState } from "@/app/actions/employees";
@@ -21,6 +25,8 @@ type EditableEmployee = {
   last_day: string;
 };
 
+// Converts a read-only schedules DB row into the mutable EditableEmployee shape.
+// All numeric IDs are converted to strings because HTML <input> values are always strings.
 function toEditableEmployee(employee: schedules): EditableEmployee {
   return {
     employee_id_current: String(employee.employee_id),
@@ -38,6 +44,11 @@ type UpdateEmployeeFormProps = {
   employees: schedules[];
 };
 
+// React component that renders the "Update employee" button and modal form.
+// Lets the user search for an existing employee, edit their fields, and submit
+// the changes via updateEmployeeAction.
+// ASYNCHRONOUS FUNCTION: useActionState wires up updateEmployeeAction, which is an
+// async server action that applies the UPDATE query to the employee record in the DB.
 export default function UpdateEmployeeForm({
   employees,
 }: UpdateEmployeeFormProps) {
@@ -51,6 +62,8 @@ export default function UpdateEmployeeForm({
   );
 
   const normalizedSearch = searchTerm.trim().toLowerCase();
+  // LIST: searchResults is a filtered subset of the employees array, narrowed down
+  // to records whose name, user ID, or employee ID matches the current search term.
   const searchResults =
     normalizedSearch.length === 0
       ? []
@@ -63,6 +76,8 @@ export default function UpdateEmployeeForm({
           );
         });
 
+  // Clears the selected employee and search term, returning the modal to the search
+  // view so the user can pick a different employee to edit.
   const handleCancelEdit = () => {
     setSelectedEmployee(null);
     setSearchTerm("");

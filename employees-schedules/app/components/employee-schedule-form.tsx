@@ -1,5 +1,9 @@
 "use client";
 
+// Client component for creating a new weekly schedule assignment.
+// Rendered on the browser so it can manage local state (open/close modal, search term,
+// selected employee, and per-day schedule inputs) before submitting to the server.
+
 import { useActionState, useMemo, useState } from "react";
 import { saveWeeklyScheduleAction } from "@/app/actions/schedules";
 import type { SaveWeeklyScheduleState } from "@/app/actions/schedules";
@@ -14,6 +18,8 @@ const initialSaveWeeklyScheduleState: SaveWeeklyScheduleState = {
   error: null,
 };
 
+// LIST: WEEKDAY_META is an ordered array of objects pairing each weekday key with its
+// display label. Drives the schedule table row order and the form field name prefixes.
 const WEEKDAY_META: Array<{ key: Weekday; label: string }> = [
   { key: "monday", label: "Monday" },
   { key: "tuesday", label: "Tuesday" },
@@ -36,6 +42,9 @@ type EmployeeScheduleFormProps = {
   employees: schedules[];
 };
 
+// Returns the initial blank schedule state: all days enabled (not off) with empty times.
+// Extracted into its own function so the form can be reset to this state after saving
+// or when a different employee is selected.
 function createDefaultSchedule(): ScheduleByDay {
   return {
     monday: { isOff: false, start: "", end: "" },
@@ -48,6 +57,11 @@ function createDefaultSchedule(): ScheduleByDay {
   };
 }
 
+// React component that renders the "Assign schedule" button and modal form.
+// Lets the user search for an employee, configure each weekday's shift, and submit
+// the schedule to the saveWeeklyScheduleAction server action.
+// ASYNCHRONOUS FUNCTION: useActionState wires up saveWeeklyScheduleAction, which is an
+// async server action that writes the schedule to the database without blocking the UI.
 export default function EmployeeScheduleForm({
   employees,
 }: EmployeeScheduleFormProps) {
@@ -65,6 +79,8 @@ export default function EmployeeScheduleForm({
   );
 
   const normalizedSearch = searchTerm.trim().toLowerCase();
+  // LIST: searchResults is a filtered subset of the employees array, narrowed down
+  // to records whose name, user ID, or employee ID matches the current search term.
   const searchResults =
     normalizedSearch.length === 0
       ? []
@@ -77,6 +93,9 @@ export default function EmployeeScheduleForm({
           );
         });
 
+  // Computes the payable hours for each day in real time as the user changes time inputs.
+  // Memoized so recalculation only happens when scheduleByDay actually changes.
+  // LIST: iterates the WEEKDAY_META array to build a per-day hours record.
   const dailyHours = useMemo(() => {
     const result: Record<Weekday, number | null> = {
       monday: null,
@@ -103,11 +122,17 @@ export default function EmployeeScheduleForm({
     return result;
   }, [scheduleByDay]);
 
+  // Sums all daily hours to produce the weekly total displayed below the schedule table.
+  // RECURSION: calls sumHoursRecursive, which adds array values by calling itself with
+  // index + 1 on each invocation until the base case (index >= length) returns 0,
+  // demonstrating a recursive accumulation over a LIST of numeric hour values.
   const totalWeeklyHours = useMemo(() => {
     const numericHours = WEEKDAY_META.map((day) => dailyHours[day.key] ?? 0);
     return sumHoursRecursive(numericHours);
   }, [dailyHours]);
 
+  // Clears the selected employee, search term, and schedule inputs so the user
+  // can start a fresh search after saving or cancelling a schedule assignment.
   const resetSelection = () => {
     setSelectedEmployee(null);
     setSearchTerm("");

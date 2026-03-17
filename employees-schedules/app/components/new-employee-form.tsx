@@ -1,5 +1,9 @@
 "use client";
 
+// Client component for creating a new employee record.
+// Rendered on the browser so it can manage the modal open/close state locally
+// before delegating the actual database insert to the server action.
+
 import { useActionState, useState } from "react";
 import { createEmployeeAction } from "@/app/actions/employees";
 import type { CreateEmployeeState } from "@/app/actions/employees";
@@ -9,8 +13,15 @@ const initialCreateEmployeeState: CreateEmployeeState = {
   error: null,
 };
 
+// React component that renders the "New employee" button and modal form.
+// Collects company, employee ID, LOB, name, user ID, and hire date, then submits
+// them to createEmployeeAction and displays success or error feedback from the server.
+// ASYNCHRONOUS FUNCTION: useActionState wires up createEmployeeAction, which is an
+// async server action that inserts the employee record into the database.
 export default function NewEmployeeForm() {
   const [isOpen, setIsOpen] = useState(false);
+  // ASYNCHRONOUS FUNCTION: useActionState connects the async server action to the form,
+  // providing isPending so the submit button can be disabled while the action runs.
   const [state, formAction, isPending] = useActionState(
     createEmployeeAction,
     initialCreateEmployeeState,
